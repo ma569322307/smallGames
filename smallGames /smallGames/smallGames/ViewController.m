@@ -61,9 +61,24 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 
 @property (nonatomic,assign) NSUInteger count;
 
+//字体数组
+@property (nonatomic, strong) NSMutableArray *titles;
+
+
 @end
 
 @implementation ViewController
+-(NSMutableArray *)titles{
+    if (!_titles) {
+        _titles = [NSMutableArray arrayWithObjects:@"镖\n局",@"兵\n部",@"船\n家",@"铛\n铺",@"东\n厂",@"赌\n场",
+                   @"粉\n巷",@"侯\n府",@"花\n房",@"剑\n庐",@"李\n府",@"柳\n巷",
+                   @"罗\n家",@"筝\n房",@"茅\n房",@"梦\n魇",@"庞\n府",@"书\n房",
+                   @"寺\n庙",@"苏\n堤",@"唐\n门",@"戏\n台",@"烟\n馆",@"雁\n塔",
+                   @"药\n铺",@"乐\n坊",@"杂\n耍", nil];
+    }
+    return _titles;
+}
+
 -(NSMutableArray *)points{
     if (!_points) {
         _points = [[NSMutableArray alloc]init];
@@ -122,6 +137,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 -(void)zoomToRectBase:(BOOL)scale{
     CGRect rect;
     if (scale) {
+        [self pauseLayer];
         _rect = self.scrollView.bounds;
         rect.size.width  = _scrollViewSize.width  / self.scrollView.minimumZoomScale;
         rect.size.height = _scrollViewSize.height / self.scrollView.maximumZoomScale;
@@ -129,6 +145,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         rect.origin.y    = self.playerMoveScopeView.centerY - (rect.size.height)/2.0;
         
     }else{
+        [self resumeLayer];
         rect = _rect;
     }
     [self.scrollView zoomToRect:rect animated:YES];
@@ -144,12 +161,15 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     }else if (sender.tag == 21){
         _scaleBool = !_scaleBool;
         if (_scaleBool) {
+            [self pauseLayer];
+
             //记住放大之前，缩小时的 rect
             _rect = self.scrollView.bounds;
             //记住了，然后放大
             [self.scrollView zoomToRect:self.playerMoveScopeView.frame animated:YES];
             
         }else{
+            [self resumeLayer];
             [self.scrollView zoomToRect:_rect animated:YES];
         }
     }
@@ -191,8 +211,15 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         [[MusicManager manager] replaceItemWithUrlString:url andRepeat:YES];
     });
     
+//    UIImageView *imageView = [[UIImageView alloc]initWithFrame:self.view.frame];
+//    imageView.image = [UIImage imageNamed:@"bg"];
+//    [self.view addSubview:imageView];
+
+    
     [self setup];
     [self topView];
+    
+    
     [self.view addSubview:self.scrollView];
     //放了 scrollView 以后放一层透明的全覆盖 uiview 上去，以便于缩小观察
     UIView *maskView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, _contentSize.width, _contentSize.height)];
@@ -298,10 +325,10 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     //这里三秒钟以后呼叫主线程去开始动画
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
-//        [self.linkDisplay addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-//        for (int i = 0; i<[self.moveArray count]; i++) {
-//            self.completion(i);
-//        }
+        [self.linkDisplay addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        for (int i = 0; i<[self.moveArray count]; i++) {
+            self.completion(i);
+        }
     });
     
 }
@@ -571,7 +598,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         _scrollViewSize = CGSizeMake(K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight);
         //记录 scrollview 可滚动的范围
         _contentSize = _scrollView.contentSize;
-        _scrollView.backgroundColor = [UIColor whiteColor];
+        _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.contentOffset = CGPointMake(K_UISCREEN_WIDTH+(padd+K_ITEMWIDTH)/2, _scrollViewSize.height+(padd+K_ITEMHEIGHT)/2);
         
         _scrollView.minimumZoomScale = (K_UISCREEN_HEIGHT-90)/_contentSize.height;
@@ -606,16 +633,42 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     if (!_playerMoveScopeView) {
         UIView *view = [self.view viewWithTag:45];
         _playerMoveScopeView = [[UIView alloc]initWithFrame:CGRectInset(view.frame, K_UISCREEN_WIDTH-15, (K_UISCREEN_HEIGHT-K_stateBarHeight-15))];
-        _playerMoveScopeView.backgroundColor = [UIColor whiteColor];
+        _playerMoveScopeView.backgroundColor = [UIColor clearColor];
+        
+        
+        
+        UIImageView *imageView = [[UIImageView alloc]initWithFrame:_playerMoveScopeView.bounds];
+        imageView.image = [UIImage imageNamed:@"bg"];
+        [_playerMoveScopeView addSubview:imageView];
         
         //创建大地图背景
         for (int i = 0; i<20; i++) {
             for (int j = 0; j<12; j++) {
                 UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(padd+(padd+K_ITEMWIDTH)*j, padd+(padd +K_ITEMHEIGHT)*i, K_ITEMWIDTH, K_ITEMHEIGHT)];
                 NSLog(@"%f---%f",imageView.width,imageView.height);
-                imageView.backgroundColor = [UIColor blackColor];
+                imageView.backgroundColor = [UIColor clearColor];
+                imageView.contentMode = UIViewContentModeScaleToFill;
                 imageView.image = [UIImage imageNamed:@"borderline"];
+                
+//                UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 65.6)];
+//                view.backgroundColor = [UIColor redColor];
+//                [imageView addSubview:view];
+                
+                UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 65.6)];
+                label.backgroundColor = [UIColor clearColor];
+                label.textAlignment = NSTextAlignmentCenter;
+//                label.center = imageView.center;
+                NSInteger index = arc4random()%27;
+                label.text = [self.titles objectAtIndex:index];
+                label.numberOfLines = 2;
+                label.font = [UIFont systemFontOfSize:50 weight:15];
+                label.font  =[UIFont fontWithName:@"FZXiaoZhuanTi-S13T" size:23];
+                label.shadowColor = [UIColor whiteColor];
+                label.shadowOffset = CGSizeMake(1, 1);
+//                label.center = imageView.center;
+                [imageView addSubview:label];
                 [_playerMoveScopeView addSubview:imageView];
+
             }
         }
         
