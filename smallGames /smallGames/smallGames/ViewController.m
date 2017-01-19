@@ -298,10 +298,10 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     //这里三秒钟以后呼叫主线程去开始动画
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
-        [self.linkDisplay addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        for (int i = 0; i<[self.moveArray count]; i++) {
-            self.completion(i);
-        }
+//        [self.linkDisplay addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//        for (int i = 0; i<[self.moveArray count]; i++) {
+//            self.completion(i);
+//        }
     });
     
 }
@@ -571,7 +571,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         _scrollViewSize = CGSizeMake(K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight);
         //记录 scrollview 可滚动的范围
         _contentSize = _scrollView.contentSize;
-        _scrollView.backgroundColor = [UIColor grayColor];
+        _scrollView.backgroundColor = [UIColor whiteColor];
         _scrollView.contentOffset = CGPointMake(K_UISCREEN_WIDTH+(padd+K_ITEMWIDTH)/2, _scrollViewSize.height+(padd+K_ITEMHEIGHT)/2);
         
         _scrollView.minimumZoomScale = (K_UISCREEN_HEIGHT-90)/_contentSize.height;
@@ -606,13 +606,15 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     if (!_playerMoveScopeView) {
         UIView *view = [self.view viewWithTag:45];
         _playerMoveScopeView = [[UIView alloc]initWithFrame:CGRectInset(view.frame, K_UISCREEN_WIDTH-15, (K_UISCREEN_HEIGHT-K_stateBarHeight-15))];
-        _playerMoveScopeView.backgroundColor = [UIColor grayColor];
+        _playerMoveScopeView.backgroundColor = [UIColor whiteColor];
         
         //创建大地图背景
         for (int i = 0; i<20; i++) {
             for (int j = 0; j<12; j++) {
                 UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(padd+(padd+K_ITEMWIDTH)*j, padd+(padd +K_ITEMHEIGHT)*i, K_ITEMWIDTH, K_ITEMHEIGHT)];
-                imageView.backgroundColor = [UIColor whiteColor];
+                NSLog(@"%f---%f",imageView.width,imageView.height);
+                imageView.backgroundColor = [UIColor blackColor];
+                imageView.image = [UIImage imageNamed:@"borderline"];
                 [_playerMoveScopeView addSubview:imageView];
             }
         }

@@ -24,6 +24,7 @@
 		CD1B872A1E28BF5C002A4457 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CD1B871C1E28BF5C002A4457 /* NSLayoutConstraint+MASDebugAdditions.m */; };
 		CD1B872B1E28BF5C002A4457 /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CD1B871E1E28BF5C002A4457 /* View+MASAdditions.m */; };
 		CD1B872C1E28BF5C002A4457 /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CD1B87211E28BF5C002A4457 /* ViewController+MASAdditions.m */; };
+		CD1F6A5D1E308E0400E05179 /* DEInfiniteTileMarqueeView.m in Sources */ = {isa = PBXBuildFile; fileRef = CD1F6A5C1E308E0400E05179 /* DEInfiniteTileMarqueeView.m */; };
 		CD31E5A51E1C8A52008B171D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD31E5A41E1C8A52008B171D /* main.m */; };
 		CD31E5A81E1C8A52008B171D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CD31E5A71E1C8A52008B171D /* AppDelegate.m */; };
 		CD31E5AB1E1C8A52008B171D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD31E5AA1E1C8A52008B171D /* ViewController.m */; };
@@ -77,6 +78,8 @@
 		CD1B871F1E28BF5C002A4457 /* View+MASShorthandAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "View+MASShorthandAdditions.h"; sourceTree = "<group>"; };
 		CD1B87201E28BF5C002A4457 /* ViewController+MASAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ViewController+MASAdditions.h"; sourceTree = "<group>"; };
 		CD1B87211E28BF5C002A4457 /* ViewController+MASAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViewController+MASAdditions.m"; sourceTree = "<group>"; };
+		CD1F6A5B1E308E0400E05179 /* DEInfiniteTileMarqueeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DEInfiniteTileMarqueeView.h; sourceTree = "<group>"; };
+		CD1F6A5C1E308E0400E05179 /* DEInfiniteTileMarqueeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DEInfiniteTileMarqueeView.m; sourceTree = "<group>"; };
 		CD31E5A01E1C8A52008B171D /* 跑步永无止境.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "跑步永无止境.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD31E5A41E1C8A52008B171D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CD31E5A61E1C8A52008B171D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -204,6 +207,8 @@
 		CD31E5DE1E1C9D53008B171D /* ResourceFile */ = {
 			isa = PBXGroup;
 			children = (
+				CD1F6A5B1E308E0400E05179 /* DEInfiniteTileMarqueeView.h */,
+				CD1F6A5C1E308E0400E05179 /* DEInfiniteTileMarqueeView.m */,
 				CD1B86911E271441002A4457 /* YSProgressView.h */,
 				CD1B86921E271441002A4457 /* YSProgressView.m */,
 				CDAA638E1E24DD2C00C01C1E /* GamesTargetRadarView.h */,
@@ -319,6 +324,7 @@
 				CDAA63931E24DE5100C01C1E /* YYTAlertView.m in Sources */,
 				CD31E5E11E1C9D5E008B171D /* UIView+Extension.m in Sources */,
 				CD65C1511E2E11FE00AA238E /* newPageViewController.m in Sources */,
+				CD1F6A5D1E308E0400E05179 /* DEInfiniteTileMarqueeView.m in Sources */,
 				CD31E5A51E1C8A52008B171D /* main.m in Sources */,
 				CD1B87291E28BF5C002A4457 /* NSArray+MASAdditions.m in Sources */,
 				CD1B87271E28BF5C002A4457 /* MASViewAttribute.m in Sources */,
