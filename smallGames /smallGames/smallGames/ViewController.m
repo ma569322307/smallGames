@@ -66,7 +66,24 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 
 //    缩放之前记住坐标
 @property (nonatomic, assign) CGPoint point;
+//上面向存放卷轴位置
+@property (nonatomic, strong) NSMutableArray *cursesTopBooks;
 
+
+//下面存放卷轴的位置
+@property (nonatomic, strong) NSMutableArray *cursesBottomBooks;
+
+@property (nonatomic, assign) CGRect scaleRect;
+
+
+//记录关卡数
+@property (nonatomic,assign) NSInteger customPassValue;
+
+//第几张卷轴
+@property (nonatomic,assign) NSInteger index;
+
+//撞上的是什么
+@property (nonatomic,assign) MoveType type;
 
 @end
 
@@ -91,7 +108,9 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 -(GamesTargetRadarView *)targetView{
     if (!_targetView) {
         
-        _targetView = [[GamesTargetRadarView alloc]initWithFrame:CGRectMake(self.scrollViewSize.width +(padd + K_ITEMWIDTH) * 8-15, self.scrollViewSize.height + (padd + K_ITEMHEIGHT) *16-15, 200, 200)];
+        _targetView = [[GamesTargetRadarView alloc]initWithFrame:CGRectMake((padd + K_ITEMWIDTH) * 3-15, (padd + K_ITEMHEIGHT) *3-15, 200, 200)];
+        _targetView.center =CGPointMake(self.scrollViewSize.width +(padd + K_ITEMWIDTH) * 3, self.scrollViewSize.height + (padd + K_ITEMHEIGHT) *3);
+        _targetView.center = [self.cursesBottomBooks[arc4random()%3] CGPointValue];
     }
     return _targetView;
 }
@@ -132,7 +151,31 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     view.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH, 90);
     [self.view addSubview:view];
     
+    
+    
+    
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, 0, 50, 50);
+    button.backgroundColor = [UIColor redColor];
+    [button addTarget:self action:@selector(state:) forControlEvents:UIControlEventTouchUpInside];
+    [view addSubview:button];
+    
     _count = 280;
+}
+-(void)state:(UIButton *)sender{
+    sender.selected = !sender.selected;
+    if (sender.selected) {
+        
+        _scaleRect = self.scrollView.bounds;
+        
+        [self.scrollView zoomToRect:CGRectMake(0, 0, _contentSize.width, _contentSize.height) animated:YES];
+        
+    }else{
+        
+        [self.scrollView zoomToRect:_scaleRect animated:YES];
+    }
+    
+
 }
 -(NSMutableArray *)animations{
     if (!_animations) {
@@ -181,11 +224,26 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     return rect;
 }
 -(void)setup{
+    
+    //默认第一关
+    _customPassValue = 1;
+    
     _row = 0;
     _colum = 1;
+    
+    //捡到的卷轴数量
+    _index = 0;
     //记录一下当前时间
     _date = [NSDate date];
-
+    
+    self.cursesTopBooks = [NSMutableArray arrayWithObjects:
+                           [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 2,15 +(padd + K_ITEMHEIGHT) *2)],
+                           [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 6, 15 +(padd + K_ITEMHEIGHT) *2)],
+                            [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 10,15 +(padd + K_ITEMHEIGHT) *2)],nil];
+    self.cursesBottomBooks = [NSMutableArray arrayWithObjects:
+                              [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 2, 15 +(padd + K_ITEMHEIGHT) *19)],
+                              [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 6,15 +(padd + K_ITEMHEIGHT) *19)],
+                              [NSValue valueWithCGPoint:CGPointMake(15 +(padd + K_ITEMWIDTH) * 12,15 +(padd + K_ITEMHEIGHT) *19)], nil];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -214,13 +272,15 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     
     
     [maskView addSubview:self.playerMoveScopeView];
-    [maskView addSubview:self.targetView];
+    [self.playerMoveScopeView addSubview:self.targetView];
     self.moveArray = [[NSMutableArray alloc]init];
     
     //添加动画
     for (int i = 0; i<250; i++) {
-        UIImageView *bollimageView = [[UIImageView alloc]initWithFrame:CGRectMake(i%10*(K_ITEMWIDTH+padd)*2-15+K_ITEMWIDTH+padd, i/10*(K_ITEMHEIGHT+padd)-15, padd, padd)];
-        
+        //第一关相关设置
+        if (_customPassValue == 1) {
+        //如果是第一关的相关设置
+        UIImageView *bollimageView = [[UIImageView alloc]initWithFrame:CGRectMake(i%10*(K_ITEMWIDTH+padd)*2-15+K_ITEMWIDTH+padd, i/10*(K_ITEMHEIGHT+padd) *3-15, padd, padd)];
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position"];
         [animation setValue:[NSNumber numberWithInt:i] forKey:@"animationIndex"];
         [self.animations addObject:animation];
@@ -228,7 +288,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         
         UserStorePointModel *model = [[UserStorePointModel alloc]init];
         model.row = i%10 *2+1;
-        model.colum = i/10;
+        model.colum = 3*i/10;
         [self.points addObject:model];
         
         bollimageView.backgroundColor = [UIColor clearColor];
@@ -284,9 +344,9 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     
             };//-----------------myblock
         });//------------------------------------------------------------异步线程
+        }
     }
     [maskView addSubview:self.player];
-    [self.playerMoveScopeView addSubview:self.targetView];
     
     //添加每帧定时器来检测是否碰撞了
     self.linkDisplay = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateMoveViewFrame)];
@@ -448,13 +508,51 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         [view setNeedsDisplay];
     }
     //判断有没有捡到碎片
-    if (fabs(self.player.layer.presentationLayer.frame.origin.x+16-self.targetView.centerX) <16 &&
-        fabs(self.player.layer.presentationLayer.frame.origin.y+16-self.targetView.centerY) <16  && fabs([_date timeIntervalSinceNow])>0.25) {
+    if (fabs(self.player.layer.presentationLayer.frame.origin.x+16-(self.targetView.centerX + self.playerMoveScopeView.x)) <16 &&
+        fabs(self.player.layer.presentationLayer.frame.origin.y+16-(self.targetView.centerY + self.playerMoveScopeView.y)) <16  && fabs([_date timeIntervalSinceNow])>0.25) {
         _date = [NSDate date];
         //检测到捡到了碎片以后的处理，首先暂停所有动画
         [self pauseLayer];
+        //弹框；
+        ++_index;
         
-        return;
+        if (_index == 6 || _index == 12 || _index == 18) {
+            NSLog(@"第几关开始了 %ld",_index / 6 + 1);
+            //如果是第六长卷轴，那么进入下一关
+            self.type = K_OtherType;
+            
+            ++_customPassValue;
+            
+        }else{
+            
+            self.type = K_JuanZhouType;
+        }
+        
+        [[YYTAlertView showFetchAlertViewWithType:self.type andType:0 andBlcok:^(NSUInteger checkPoint){
+            if (_index == 6) {
+                //进入下一关
+                NSLog(@"第二关的相关设置");
+                
+                //第二关的相关设置
+                [self theSecondCustomSet];
+                
+//                [NSThread sleepForTimeInterval:5];
+                
+            }else if(_index ==  12) {
+            //继续随机卷轴
+                NSLog(@"第三关的相关设置");
+                [self theThreeCustomSet];
+                
+            }else if (_index == 18){
+                NSLog(@"恭喜你闯关成功了");
+            }
+            if (_index %2 == 0) {
+                _targetView.center = [self.cursesBottomBooks[arc4random()%3] CGPointValue];
+            }else{
+                _targetView.center = [self.cursesTopBooks[arc4random()%3] CGPointValue];
+            }
+            [self sureButtonClick];
+        } aandAdd:[[UIApplication sharedApplication] keyWindow] and:NO] show];
     }
     
     //判断有没有碰上移动障碍物
@@ -473,7 +571,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
                 [self pauseLayer];
                 viewType type = K_tagViewFourType;
                 [[YYTAlertView showFetchAlertViewWithType:K_ZhangAiWUType andType:type andBlcok:^(NSUInteger checkPoint){
-                    
+
                     [self sureButtonClick];
                     
                 } aandAdd:[[UIApplication sharedApplication] keyWindow] and:NO] show];
@@ -485,36 +583,34 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     
 }
 
-
-
-
-#pragma mark-----动画的暂停与继续
-//暂停添加到这个视图上的动画效果
-- (void)pauseLayer{
-    //也暂停定时器
-    _linkDisplay.paused = YES;
-    //暂停动画
-    for (UIImageView *view in self.moveArray) {
-        CFTimeInterval pausedTime = [view.layer convertTime:CACurrentMediaTime() fromLayer:nil];
-        view.layer.speed = 0.0;
-        view.layer.timeOffset = pausedTime;
+/**
+ 第二关的相关设置
+ */
+-(void)theSecondCustomSet{
+    for (int i = 0; i< [self.moveArray count]; i++) {
+                UserStorePointModel *model = [self.points objectAtIndex:i];
+                model.row = i%10 *2+1;
+                model.colum =2 * i/10;
+                UIImageView *imageView = [self.moveArray objectAtIndex:i];
+                imageView.frame = CGRectMake(i%10*(K_ITEMWIDTH+padd)*2-15+K_ITEMWIDTH+padd, i/10*(K_ITEMHEIGHT+padd) *2-15, padd, padd);
     }
-}
-//继续layer上面的动画
-- (void)resumeLayer{
-    //打开定时器
-    _linkDisplay.paused = NO;
+    NSLog(@"布局完成");
+//    [NSThread sleepForTimeInterval:3];
     
-    for (UIImageView *imageView in self.moveArray) {
-        CFTimeInterval pausedTime = [imageView.layer timeOffset];
-        imageView.layer.speed = 1;
-        imageView.layer.timeOffset = 0.0;
-        imageView.layer.beginTime = 0.0;
-        CFTimeInterval timeSincePause = [imageView.layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
-        imageView.layer.beginTime = timeSincePause;
-    }
+    
 }
-
+-(void)theThreeCustomSet{
+    
+    for (int i = 0; i< [self.moveArray count]; i++) {
+        UserStorePointModel *model = [self.points objectAtIndex:i];
+        model.row = i%10 * 2 +1;
+        model.colum = i/10;
+        UIImageView *imageView = [self.moveArray objectAtIndex:i];
+        imageView.frame = CGRectMake(i%10*(K_ITEMWIDTH+padd)*2-15+K_ITEMWIDTH+padd, i/10*(K_ITEMHEIGHT+padd)-15, padd, padd);
+    }
+    NSLog(@"布局完成");
+//    [NSThread sleepForTimeInterval:3];
+}
 -(void)sureButtonClick{
     
     [self resumeLayer];
@@ -604,6 +700,33 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+#pragma mark-----动画的暂停与继续
+//暂停添加到这个视图上的动画效果
+- (void)pauseLayer{
+    //也暂停定时器
+    _linkDisplay.paused = YES;
+    //暂停动画
+    for (UIImageView *view in self.moveArray) {
+        CFTimeInterval pausedTime = [view.layer convertTime:CACurrentMediaTime() fromLayer:nil];
+        view.layer.speed = 0.0;
+        view.layer.timeOffset = pausedTime;
+    }
+}
+//继续layer上面的动画
+- (void)resumeLayer{
+    //打开定时器
+    _linkDisplay.paused = NO;
+    
+    for (UIImageView *imageView in self.moveArray) {
+        CFTimeInterval pausedTime = [imageView.layer timeOffset];
+        imageView.layer.speed = 1;
+        imageView.layer.timeOffset = 0.0;
+        imageView.layer.beginTime = 0.0;
+        CFTimeInterval timeSincePause = [imageView.layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
+        imageView.layer.beginTime = timeSincePause;
+    }
+}
+
 -(BOOL)fetchLocationBaseBackground:(CGRect)currentFrame andDirection:(int)value{
     
     CGRect currentRect = CGRectMake(currentFrame.origin.x,currentFrame.origin.y, currentFrame.size.width, currentFrame.size.height);

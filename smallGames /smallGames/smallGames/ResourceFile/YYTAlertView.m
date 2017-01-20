@@ -28,7 +28,8 @@
                     @"马革裹尸，浴血归来，对不起，你挡住本将军的路了！",
                     @"此路是我开，此树是我栽，要想从此过，嘿嘿~ ~ 你懂得",
                     @"秀才遇到兵，有理说不清，怪你嘴笨咯！！",
-                    @"古道西风瘦马，夕阳西下，没瞅见你马爷我正找吃的呢！", nil];
+                    @"古道西风瘦马，夕阳西下，没瞅见你马爷我正找吃的呢！",
+                   @"恭喜你成功闯过第一关，一大波僵尸来袭",nil];
     }
     return _titles;
 
@@ -36,6 +37,13 @@
 -(NSString *)fetchTitleWithType{
     NSString *title = nil;
     switch (self.type) {
+            
+        case K_OtherType:{
+            title = [self.titles objectAtIndex:5];
+            
+        
+        }
+            break;
         case K_JuanZhouType:
         {
             title = [self.titles objectAtIndex:0];
@@ -212,6 +220,8 @@
             
         }else if (self.type == K_ZhangAiWUType){
             self.sureBlock(0);
+        }else if(self.type == K_OtherType){
+            self.sureBlock(2);
         }
     }];
 
