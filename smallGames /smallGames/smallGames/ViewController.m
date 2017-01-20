@@ -64,6 +64,9 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 //字体数组
 @property (nonatomic, strong) NSMutableArray *titles;
 
+//    缩放之前记住坐标
+@property (nonatomic, assign) CGPoint point;
+
 
 @end
 
@@ -103,30 +106,33 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     }
     return _player;
 }
+-(UIScrollView *)scrollView{
+    if (!_scrollView) {
+        _scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, K_stateBarHeight, K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight)];
+        _scrollView.contentSize = CGSizeMake(K_UISCREEN_WIDTH*5, (K_UISCREEN_HEIGHT-K_stateBarHeight)*6);
+        //记录 scrollView 的宽高度
+        _scrollViewSize = CGSizeMake(K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight);
+        //记录 scrollview 可滚动的范围
+        _contentSize = _scrollView.contentSize;
+        _scrollView.backgroundColor = [UIColor clearColor];
+        _scrollView.contentOffset = CGPointMake(K_UISCREEN_WIDTH+(padd+K_ITEMWIDTH)/2, _scrollViewSize.height+(padd+K_ITEMHEIGHT)/2);
+        
+        _scrollView.minimumZoomScale = (K_UISCREEN_HEIGHT-90)/_contentSize.height;
+        _scrollView.maximumZoomScale = _contentSize.height/(K_UISCREEN_HEIGHT-90);
+        
+        _scrollView.delegate = self;
+        _scrollView.pagingEnabled = NO;
+        _scrollView.scrollEnabled = NO;
+    }
+    return _scrollView;
+}
+
 -(void)topView{
     GamesWindowsTopView *view = [GamesWindowsTopView createGamesTopViewInstance];
     view.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH, 90);
     [self.view addSubview:view];
     
     _count = 280;
-    UIButton *button11 = [UIButton buttonWithType:UIButtonTypeCustom];
-    button11.backgroundColor = [UIColor blackColor];
-    [button11 setTitle:@"整体放大" forState: UIControlStateNormal];
-    button11.alpha = 0.1;
-    [button11 addTarget:self action:@selector(buttonScaleClicked:) forControlEvents:UIControlEventTouchUpInside];
-    button11.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH/2, 90);
-    button11.tag =20;
-    [view addSubview:button11];
-    
-    
-    UIButton *button22 = [UIButton buttonWithType:UIButtonTypeCustom];
-    button22.backgroundColor = [UIColor blackColor];
-    [button22 setTitle:@"局部放大" forState: UIControlStateNormal];
-    button22.alpha = 0.1;
-    [button22 addTarget:self action:@selector(buttonScaleClicked:) forControlEvents:UIControlEventTouchUpInside];
-    button22.frame = CGRectMake(K_UISCREEN_WIDTH/2, 0, K_UISCREEN_WIDTH/2, 90);
-    button22.tag = 21;
-    [view addSubview:button22];
 }
 -(NSMutableArray *)animations{
     if (!_animations) {
@@ -134,65 +140,45 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     }
     return _animations;
 }
--(void)zoomToRectBase:(BOOL)scale{
-    CGRect rect;
-    if (scale) {
-        [self pauseLayer];
-        _rect = self.scrollView.bounds;
-        rect.size.width  = _scrollViewSize.width  / self.scrollView.minimumZoomScale;
-        rect.size.height = _scrollViewSize.height / self.scrollView.maximumZoomScale;
-        rect.origin.x    = self.playerMoveScopeView.centerX - (rect.size.width)/2.0;
-        rect.origin.y    = self.playerMoveScopeView.centerY - (rect.size.height)/2.0;
-        
-    }else{
-        [self resumeLayer];
-        rect = _rect;
-    }
-    [self.scrollView zoomToRect:rect animated:YES];
-}
--(void)buttonScaleClicked:(UIButton *)sender{
-    if (sender.tag == 20) {
+
+-(void)buttonScaleClicked{
         _scaleBool = !_scaleBool;
         if (_scaleBool) {
-            [self zoomToRectBase:YES];
-        }else{
-            [self zoomToRectBase:NO];
-        }
-    }else if (sender.tag == 21){
-        _scaleBool = !_scaleBool;
-        if (_scaleBool) {
+            // 首先暂停动画
             [self pauseLayer];
 
             //记住放大之前，缩小时的 rect
-            _rect = self.scrollView.bounds;
+            _point = CGPointMake(self.scrollView.contentOffset.x, self.scrollView.contentOffset.y); //记住放大之前的偏移量是多少。还要缩回来
+            CGRect rect = [self zoomRectScale:self.player.center andBOOL:YES];
+            
+
             //记住了，然后放大
-            [self.scrollView zoomToRect:self.playerMoveScopeView.frame animated:YES];
+            [self.scrollView zoomToRect:rect animated:YES];
             
         }else{
             [self resumeLayer];
-            [self.scrollView zoomToRect:_rect animated:YES];
+            CGRect rect = [self zoomRectScale:self.player.center andBOOL:NO];
+
+            [self.scrollView zoomToRect:rect animated:YES];
         }
-    }
+}
+-(CGRect)zoomRectScale:(CGPoint)center andBOOL:(BOOL)open{
+    CGRect rect;
+    UIView *view = [self.view viewWithTag:46];
+    if (open) {
+        //先禁止手势
+        view.userInteractionEnabled = NO;
+        rect = self.playerMoveScopeView.frame;
+    }else{
+        //启动手势
+        view.userInteractionEnabled = YES;
+        rect.size.width = K_UISCREEN_WIDTH;
+        rect.size.height = K_UISCREEN_HEIGHT-90;
+        rect.origin.x = _point.x;
+        rect.origin.y = _point.y;
     
-    ////    if (sender.tag == 20) {
-    //        _scaleBool = !_scaleBool;
-    ////        if (_scaleBool) {
-    ////            [self zoomToRectBase:YES];
-    ////        }else{
-    ////            [self zoomToRectBase:NO];
-    ////        }
-    ////    }else if (sender.tag == 21){
-    ////        _scaleBool = !_scaleBool;
-    //        if (_scaleBool) {
-    //            //记住放大之前，缩小时的 rect
-    //            _rect = self.scrollView.bounds;
-    //            //记住了，然后放大
-    //            [self.scrollView zoomToRect:self.playerMoveScopeView.frame animated:YES];
-    //
-    //        }else{
-    //            [self.scrollView zoomToRect:_rect animated:YES];
-    //        }
-    ////    }
+    }
+    return rect;
 }
 -(void)setup{
     _row = 0;
@@ -207,15 +193,9 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         //背景音乐的播放
-        NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Emilia Rydberg-Big Big World" ofType:@"mp3"]];
+        NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Emilia Rydberg-Big Big World0001" ofType:@"mp3"]];
         [[MusicManager manager] replaceItemWithUrlString:url andRepeat:YES];
     });
-    
-//    UIImageView *imageView = [[UIImageView alloc]initWithFrame:self.view.frame];
-//    imageView.image = [UIImage imageNamed:@"bg"];
-//    [self.view addSubview:imageView];
-
-    
     [self setup];
     [self topView];
     
@@ -226,8 +206,14 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     maskView.backgroundColor = [UIColor blackColor];
     maskView.tag = 45;
     [self.scrollView addSubview:maskView];
+    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(self.playerMoveScopeView.x-100,self.playerMoveScopeView.y-100 , 1190, 2142)];
+    image.contentMode = UIViewContentModeScaleToFill;
+    image.image = [UIImage imageNamed:@"bg2"];
+    [maskView addSubview:image];
+    
+    
+    
     [maskView addSubview:self.playerMoveScopeView];
-    [maskView addSubview:self.player];
     [maskView addSubview:self.targetView];
     self.moveArray = [[NSMutableArray alloc]init];
     
@@ -299,13 +285,13 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
             };//-----------------myblock
         });//------------------------------------------------------------异步线程
     }
-    [self.scrollView addSubview:self.player];
+    [maskView addSubview:self.player];
     [self.playerMoveScopeView addSubview:self.targetView];
     
     //添加每帧定时器来检测是否碰撞了
     self.linkDisplay = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateMoveViewFrame)];
     
-    //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(buttonScaleClicked) name:@"backgroundstate" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(buttonScaleClicked) name:@"backgroundstate" object:nil];
     
     NSArray * array = @[@(UISwipeGestureRecognizerDirectionLeft),
                         @(UISwipeGestureRecognizerDirectionRight),
@@ -313,6 +299,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
                         @(UISwipeGestureRecognizerDirectionDown)];
     
     UIView *view = [[UIView alloc]initWithFrame:self.scrollView.frame];
+    view.tag = 46;
     view.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view];
     // 定义一个四个方向手势
@@ -333,42 +320,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     
 }
 
-//处理在指定方向上移动一个单位
--(void)fetchAllStateMoveViewToChangeValue:(CABasicAnimation *)animation and:(NSInteger)value andView:(UIImageView *)imageView andModel:(UserStorePointModel *)model{
-    
-                    switch (value) {
-                        case 0:
-                        {
-                            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX, imageView.centerY-95)];
-                            model.colum = model.colum - 1;
-                        }
-                            break;
-                        case 1:
-                        {
-                            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX, imageView.centerY+K_ITEMHEIGHT+padd)];
-                            model.colum = model.colum + 1;
-                        }
-                            break;
-    
-                        case 2:
-                        {
-                            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX-K_ITEMWIDTH-padd, imageView.centerY)];
-                            model.row = model.row - 1;
-                        }
-                            break;
-    
-                        case 3:
-                        {
-                            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX+K_ITEMWIDTH+padd, imageView.centerY)];
-                            model.row = model.row + 1;
-                        }
-                            break;
-                        default:
-                            break;
-                    }
-    [imageView.layer addAnimation:animation forKey:@"animation"];
-
-}
 
 #pragma mark----四个手势处理
 -(void)tapRecognizer:(UISwipeGestureRecognizer *)sender{
@@ -489,25 +440,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     }
 }
 
-
-/**
- <#Description#>
-
- @param currentFrame 得到移动小球当前的位置信息
- @param value 得到小球下一步要移动的方向
- @return 以此参数判断小球是不是要跑出围栏
- */
--(BOOL)fetchLocationBaseBackground:(CGRect)currentFrame andDirection:(int)value{
-    
-    CGRect currentRect = CGRectMake(currentFrame.origin.x,currentFrame.origin.y, currentFrame.size.width, currentFrame.size.height);
-    return (currentRect.origin.y <= 0                         && value == 0) ||
-    (currentRect.origin.y >= _contentSize.height       && value == 1) ||
-    (currentRect.origin.x <= 0                         && value == 2) ||
-    (currentRect.origin.x >= _contentSize.width        && value == 3)?
-    NO:YES;
-    
-}
-
 #pragma mark------定时器刷新 UI 界面
 -(void)updateMoveViewFrame{
     for (UIImageView *view in self.moveArray) {
@@ -541,7 +473,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
                 [self pauseLayer];
                 viewType type = K_tagViewFourType;
                 [[YYTAlertView showFetchAlertViewWithType:K_ZhangAiWUType andType:type andBlcok:^(NSUInteger checkPoint){
-                    NSLog(@"蠢货，又撞南墙了");
                     
                     [self sureButtonClick];
                     
@@ -590,24 +521,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     _date = [NSDate date];
 }
 
--(UIScrollView *)scrollView{
-    if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, K_stateBarHeight, K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight)];
-        _scrollView.contentSize = CGSizeMake(K_UISCREEN_WIDTH*5, (K_UISCREEN_HEIGHT-K_stateBarHeight)*6);
-        //记录 scrollView 的宽高度
-        _scrollViewSize = CGSizeMake(K_UISCREEN_WIDTH, K_UISCREEN_HEIGHT-K_stateBarHeight);
-        //记录 scrollview 可滚动的范围
-        _contentSize = _scrollView.contentSize;
-        _scrollView.backgroundColor = [UIColor clearColor];
-        _scrollView.contentOffset = CGPointMake(K_UISCREEN_WIDTH+(padd+K_ITEMWIDTH)/2, _scrollViewSize.height+(padd+K_ITEMHEIGHT)/2);
-        
-        _scrollView.minimumZoomScale = (K_UISCREEN_HEIGHT-90)/_contentSize.height;
-        _scrollView.maximumZoomScale = _contentSize.height/(K_UISCREEN_HEIGHT-90);
-        _scrollView.delegate = self;
-        _scrollView.pagingEnabled = NO;
-    }
-    return _scrollView;
-}
 
 #pragma mark------CAAnimationDelegate
 - (void)animationDidStart:(CAAnimation *)anim{
@@ -627,54 +540,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
     
     return [self.view viewWithTag:45];
-}
-
--(UIView *)playerMoveScopeView{
-    if (!_playerMoveScopeView) {
-        UIView *view = [self.view viewWithTag:45];
-        _playerMoveScopeView = [[UIView alloc]initWithFrame:CGRectInset(view.frame, K_UISCREEN_WIDTH-15, (K_UISCREEN_HEIGHT-K_stateBarHeight-15))];
-        _playerMoveScopeView.backgroundColor = [UIColor clearColor];
-        
-        
-        
-        UIImageView *imageView = [[UIImageView alloc]initWithFrame:_playerMoveScopeView.bounds];
-        imageView.image = [UIImage imageNamed:@"bg"];
-        [_playerMoveScopeView addSubview:imageView];
-        
-        //创建大地图背景
-        for (int i = 0; i<20; i++) {
-            for (int j = 0; j<12; j++) {
-                UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(padd+(padd+K_ITEMWIDTH)*j, padd+(padd +K_ITEMHEIGHT)*i, K_ITEMWIDTH, K_ITEMHEIGHT)];
-                NSLog(@"%f---%f",imageView.width,imageView.height);
-                imageView.backgroundColor = [UIColor clearColor];
-                imageView.contentMode = UIViewContentModeScaleToFill;
-                imageView.image = [UIImage imageNamed:@"borderline"];
-                
-//                UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 65.6)];
-//                view.backgroundColor = [UIColor redColor];
-//                [imageView addSubview:view];
-                
-                UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 65.6)];
-                label.backgroundColor = [UIColor clearColor];
-                label.textAlignment = NSTextAlignmentCenter;
-//                label.center = imageView.center;
-                NSInteger index = arc4random()%27;
-                label.text = [self.titles objectAtIndex:index];
-                label.numberOfLines = 2;
-                label.font = [UIFont systemFontOfSize:50 weight:15];
-                label.font  =[UIFont fontWithName:@"FZXiaoZhuanTi-S13T" size:23];
-                label.shadowColor = [UIColor whiteColor];
-                label.shadowOffset = CGSizeMake(1, 1);
-//                label.center = imageView.center;
-                [imageView addSubview:label];
-                [_playerMoveScopeView addSubview:imageView];
-
-            }
-        }
-        
-    }
-    return _playerMoveScopeView;
-    
 }
 //碰撞了的时候处理血条问题
 //-(void)impact{
@@ -697,10 +562,93 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 //    _value.progressValue = progressWidth;
 //}
 //
-
+-(UIView *)playerMoveScopeView{
+    if (!_playerMoveScopeView) {
+        UIView *view = [self.view viewWithTag:45];
+        _playerMoveScopeView = [[UIView alloc]initWithFrame:CGRectInset(view.frame, K_UISCREEN_WIDTH-15, (K_UISCREEN_HEIGHT-K_stateBarHeight-15))];
+        _playerMoveScopeView.backgroundColor = [UIColor clearColor];
+        UIImageView *imageView = [[UIImageView alloc]initWithFrame:_playerMoveScopeView.bounds];
+        imageView.image = [UIImage imageNamed:@"bg"];
+        [_playerMoveScopeView addSubview:imageView];
+        
+        //创建大地图背景
+        for (int i = 0; i<20; i++) {
+            for (int j = 0; j<12; j++) {
+                UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(padd+(padd+K_ITEMWIDTH)*j, padd+(padd +K_ITEMHEIGHT)*i, K_ITEMWIDTH, K_ITEMHEIGHT)];
+                imageView.backgroundColor = [UIColor clearColor];
+                imageView.contentMode = UIViewContentModeScaleToFill;
+                imageView.image = [UIImage imageNamed:@"borderline"];
+                
+                
+                UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 65.6)];
+                label.backgroundColor = [UIColor clearColor];
+                label.textAlignment = NSTextAlignmentCenter;
+                NSInteger index = arc4random()%27;
+                label.text = [self.titles objectAtIndex:index];
+                label.numberOfLines = 2;
+                label.font = [UIFont systemFontOfSize:50 weight:15];
+                label.font  =[UIFont fontWithName:@"FZXiaoZhuanTi-S13T" size:23];
+                label.shadowColor = [UIColor whiteColor];
+                label.shadowOffset = CGSizeMake(1, 1);
+                [imageView addSubview:label];
+                [_playerMoveScopeView addSubview:imageView];
+                
+            }
+        }
+        
+    }
+    return _playerMoveScopeView;
+    
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+-(BOOL)fetchLocationBaseBackground:(CGRect)currentFrame andDirection:(int)value{
+    
+    CGRect currentRect = CGRectMake(currentFrame.origin.x,currentFrame.origin.y, currentFrame.size.width, currentFrame.size.height);
+    return (currentRect.origin.y <= 0                         && value == 0) ||
+    (currentRect.origin.y >= _contentSize.height       && value == 1) ||
+    (currentRect.origin.x <= 0                         && value == 2) ||
+    (currentRect.origin.x >= _contentSize.width        && value == 3)?
+    NO:YES;
+    
+}
+//处理在指定方向上移动一个单位
+-(void)fetchAllStateMoveViewToChangeValue:(CABasicAnimation *)animation and:(NSInteger)value andView:(UIImageView *)imageView andModel:(UserStorePointModel *)model{
+    
+    switch (value) {
+        case 0:
+        {
+            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX, imageView.centerY-95)];
+            model.colum = model.colum - 1;
+        }
+            break;
+        case 1:
+        {
+            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX, imageView.centerY+K_ITEMHEIGHT+padd)];
+            model.colum = model.colum + 1;
+        }
+            break;
+            
+        case 2:
+        {
+            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX-K_ITEMWIDTH-padd, imageView.centerY)];
+            model.row = model.row - 1;
+        }
+            break;
+            
+        case 3:
+        {
+            animation.toValue = [NSValue valueWithCGPoint:CGPointMake(imageView.centerX+K_ITEMWIDTH+padd, imageView.centerY)];
+            model.row = model.row + 1;
+        }
+            break;
+        default:
+            break;
+    }
+    [imageView.layer addAnimation:animation forKey:@"animation"];
+    
 }
 
 

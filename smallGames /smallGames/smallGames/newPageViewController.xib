@@ -85,14 +85,14 @@
                     <rect key="frame" x="40" y="440" width="240" height="100"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="s6X-1W-1iL">
-                            <rect key="frame" x="112" y="-25" width="15" height="45"/>
+                            <rect key="frame" x="112" y="-25" width="15" height="72"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="45" id="n5n-qF-aOe"/>
+                                <constraint firstAttribute="height" constant="72" id="n5n-qF-aOe"/>
                             </constraints>
                         </imageView>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon" translatesAutoresizingMaskIntoConstraints="NO" id="2E1-zh-pcb">
-                            <rect key="frame" x="100" y="72" width="36" height="28"/>
+                            <rect key="frame" x="101" y="56" width="36" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="28" id="MFP-VS-fPA"/>
                             </constraints>
@@ -102,11 +102,11 @@
                     <constraints>
                         <constraint firstItem="s6X-1W-1iL" firstAttribute="leading" secondItem="qca-Gs-Fhb" secondAttribute="leading" constant="112" id="7q5-qf-wsS"/>
                         <constraint firstAttribute="height" constant="100" id="Dvg-6u-sCa"/>
-                        <constraint firstItem="2E1-zh-pcb" firstAttribute="top" secondItem="s6X-1W-1iL" secondAttribute="bottom" constant="52" id="QmT-P0-B4J"/>
+                        <constraint firstItem="2E1-zh-pcb" firstAttribute="top" secondItem="s6X-1W-1iL" secondAttribute="bottom" constant="9" id="QmT-P0-B4J"/>
                         <constraint firstAttribute="trailing" secondItem="s6X-1W-1iL" secondAttribute="trailing" constant="113" id="d8O-AZ-u4c"/>
-                        <constraint firstAttribute="bottom" secondItem="2E1-zh-pcb" secondAttribute="bottom" id="dh4-j3-FxY"/>
-                        <constraint firstItem="2E1-zh-pcb" firstAttribute="leading" secondItem="qca-Gs-Fhb" secondAttribute="leading" constant="100" id="i3M-zD-Dtu"/>
-                        <constraint firstAttribute="trailing" secondItem="2E1-zh-pcb" secondAttribute="trailing" constant="104" id="zKl-gB-boV"/>
+                        <constraint firstAttribute="bottom" secondItem="2E1-zh-pcb" secondAttribute="bottom" constant="16" id="dh4-j3-FxY"/>
+                        <constraint firstItem="2E1-zh-pcb" firstAttribute="leading" secondItem="qca-Gs-Fhb" secondAttribute="leading" constant="101" id="i3M-zD-Dtu"/>
+                        <constraint firstAttribute="trailing" secondItem="2E1-zh-pcb" secondAttribute="trailing" constant="103" id="zKl-gB-boV"/>
                     </constraints>
                 </view>
             </subviews>
