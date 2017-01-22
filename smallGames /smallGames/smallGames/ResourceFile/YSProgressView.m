@@ -51,14 +51,6 @@
     
     [self _setHeightRestrictionOfFrame:self.frame.size.height];
 }
--(id)initWithFrame:(CGRect)frame{
-    if (self = [super initWithFrame:frame]) {
-        self.backgroundColor = [UIColor colorWithRed:0.937 green:0.958 blue:1.000 alpha:1.000];
-        
-        [self _setHeightRestrictionOfFrame:self.frame.size.height];
-    }
-    return self;
-}
 
 #pragma mark - Privite Method
 - (void)_setHeightRestrictionOfFrame:(CGFloat)height
@@ -69,6 +61,8 @@
     _progressHeight = MAX(_progressHeight, 5.0);
     
     self.frame = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, _progressHeight);
+    //+++++++++++++++++++
+    
     
     self.rect_progressView = CGRectZero;
     _rect_progressView.size.height = _progressHeight;
@@ -104,9 +98,12 @@
 {
     _progressValue = progressValue;
     
-    _progressValue = MIN(progressValue, self.bounds.size.width);
+    NSLog(@"%f  %f",progressValue,self.bounds.size.width);
+    
+//    _progressValue = MIN(progressValue, self.bounds.size.width);
     
     _rect_progressView.size.width = _progressValue;
+    
     
     
     CGFloat maxValue = self.bounds.size.width;
@@ -116,6 +113,7 @@
     [UIView animateWithDuration:durationValue animations:^{
         
         self.progressView.frame = _rect_progressView;
+        
     }];
 }
 

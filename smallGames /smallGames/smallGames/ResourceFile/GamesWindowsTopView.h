@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "YSProgressView.h"
 
 @interface GamesWindowsTopView : UIView
 
-
+//生命条
+@property (weak, nonatomic) IBOutlet YSProgressView *value;
 
 //返回一个实例
 +(instancetype)createGamesTopViewInstance;

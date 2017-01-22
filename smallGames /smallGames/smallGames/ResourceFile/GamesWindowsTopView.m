@@ -7,15 +7,12 @@
 //
 
 #import "GamesWindowsTopView.h"
-#import "YSProgressView.h"
 #import "UIView+Extension.h"
 @interface GamesWindowsTopView ()
 {
     UIView *progressV;
-    UIProgressView *progressV1;
+//    UIProgressView *progressV1;
 }
-//生命条
-@property (weak, nonatomic) IBOutlet YSProgressView *value;
 
 @property (weak, nonatomic) IBOutlet UIImageView *zoomImageView;
 
@@ -24,7 +21,14 @@
 @end
 @implementation GamesWindowsTopView
 -(void)drawRect:(CGRect)rect{
-    self.value.progressValue = 20;
+    
+
+    
+    self.value.progressValue = self.value.width;
+    
+    NSLog(@"----   %f",self.value.width);
+    
+    
     self.value.trackTintColor = [UIColor redColor];
     self.value.progressTintColor = [UIColor clearColor];
     
@@ -32,7 +36,9 @@
 
 }
 -(void)awakeFromNib{
+    
     [super awakeFromNib];
+    
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
     tapRecognizer.numberOfTapsRequired = 1;
     [self.zoomImageView addGestureRecognizer:tapRecognizer];
@@ -50,24 +56,11 @@
 
 }
 -(void)fetchOtherMoveCrash:(NSNotification *)noti{
-    NSUInteger count = [[[noti userInfo] objectForKey:@"key"] integerValue];
-    // 系统progress
-    [progressV1 setProgress:count animated:YES];
-    // 未封装 progressview
-//    int maxValue = 280;
-    // 变量
-    CGFloat tempValue = (CGFloat)count;
     
-    CGFloat progressWidth = tempValue;
+    CGFloat count = [[[noti userInfo] objectForKey:@"key"] floatValue];
     
-    double durationValue = (tempValue/2.0) / (tempValue * 10.0f) + .5 ;
-    
-    [UIView animateWithDuration:durationValue animations:^{
-        
-        progressV.width = progressWidth;
-    }];
-    // YSProgressView
-    _value.progressValue = progressWidth;
+    NSLog(@"通知传过来的血条值:%ld",(unsigned long)count);
+    _value.progressValue = count;
 
 }
 -(void)dealloc{

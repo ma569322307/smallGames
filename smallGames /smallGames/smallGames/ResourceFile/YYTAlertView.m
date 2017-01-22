@@ -29,7 +29,7 @@
                     @"此路是我开，此树是我栽，要想从此过，嘿嘿~ ~ 你懂得",
                     @"秀才遇到兵，有理说不清，怪你嘴笨咯！！",
                     @"古道西风瘦马，夕阳西下，没瞅见你马爷我正找吃的呢！",
-                   @"恭喜你成功闯过第一关，一大波僵尸来袭",nil];
+                    @"恭喜你成功闯过第一关，一大波僵尸来袭",nil];
     }
     return _titles;
 
@@ -41,7 +41,6 @@
         case K_OtherType:{
             title = [self.titles objectAtIndex:5];
             
-        
         }
             break;
         case K_JuanZhouType:
@@ -130,14 +129,6 @@
     [centerView addSubview:button];
     
     
-    //-----------------
-    
-//    UIView *view = [[UIView alloc]initWithFrame:CGRectZero];
-//    view.backgroundColor = [UIColor redColor];
-//    [centerView addSubview:view];
-//    v
-    
-    
     UILabel *titleLabel = [[UILabel alloc]init];
     titleLabel.text = [self fetchTitleWithType];
     titleLabel.numberOfLines = 0;
@@ -152,12 +143,10 @@
     UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectZero];
     
     imageView.image = [UIImage imageNamed:@"juan"];
-//    imageView.backgroundColor = [UIColor redColor];
     [centerView addSubview:imageView];
     
     
     [imageView mas_updateConstraints:^(MASConstraintMaker *make) {
-//        make.top.left.mas_equalTo(centerView.f).offset(20);
         make.top.left.mas_equalTo(@20);
         make.width.mas_equalTo([UIImage imageNamed:@"juan"].size.width);
         make.height.mas_equalTo([UIImage imageNamed:@"juan"].size.height);
@@ -171,7 +160,6 @@
         make.right.mas_equalTo(centerView.mas_right).offset(-20);
         make.top.mas_equalTo(centerView.mas_top).offset(20);
     }];
-//    titleLabel.backgroundColor = [UIColor redColor];
     
     
     

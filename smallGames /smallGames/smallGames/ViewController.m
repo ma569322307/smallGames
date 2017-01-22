@@ -59,7 +59,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 @property (nonatomic, strong) NSDate *date;
 
 
-@property (nonatomic,assign) NSUInteger count;
+@property (nonatomic,assign) CGFloat count;
 
 //字体数组
 @property (nonatomic, strong) NSMutableArray *titles;
@@ -84,6 +84,8 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 
 //撞上的是什么
 @property (nonatomic,assign) MoveType type;
+
+@property (nonatomic,assign) CGFloat b;
 
 @end
 
@@ -155,12 +157,15 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(0, 0, 50, 50);
-    button.backgroundColor = [UIColor redColor];
+    button.frame = CGRectMake(0, 0, 80, 80);
+    button.backgroundColor = [UIColor clearColor];
     [button addTarget:self action:@selector(state:) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:button];
     
-    _count = 280;
+    _count = view.value.width;
+    
+    _b = _count;
+    
 }
 -(void)state:(UIButton *)sender{
     sender.selected = !sender.selected;
@@ -251,7 +256,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         //背景音乐的播放
-        NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Emilia Rydberg-Big Big World0001" ofType:@"mp3"]];
+        NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Emilia Rydberg-Big Big World" ofType:@"mp3"]];
         [[MusicManager manager] replaceItemWithUrlString:url andRepeat:YES];
     });
     [self setup];
@@ -536,8 +541,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
                 //第二关的相关设置
                 [self theSecondCustomSet];
                 
-//                [NSThread sleepForTimeInterval:5];
-                
             }else if(_index ==  12) {
             //继续随机卷轴
                 NSLog(@"第三关的相关设置");
@@ -561,11 +564,14 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
         if (fabs(self.player.layer.presentationLayer.frame.origin.x+16-view.centerX) <16 &&
             fabs(self.player.layer.presentationLayer.frame.origin.y+16-view.centerY) <16) {
             if (fabs([_date timeIntervalSinceNow])>0.5) {
+                
                 //如果距离上次撞击大于1秒
                 _date = [NSDate date];
                 
                 //血条的处理
-                _count = _count - 28;
+//                _count = _count - (_count/20);
+                _count = _count - (_b/20);
+                
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"K_LLIFEVALUE" object:nil userInfo:@{@"key":[NSNumber numberWithUnsignedInteger:_count]}];
                 
                 [self pauseLayer];
@@ -641,6 +647,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 //-(void)impact{
 //    // 系统progress
 //    [progressV1 setProgress:(arc4random() % 322)/322.0 animated:YES];
+//    
 //    // 未封装 progressview
 //    int maxValue = 280;
 //    // 变量
@@ -657,7 +664,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 //    // YSProgressView
 //    _value.progressValue = progressWidth;
 //}
-//
+
 -(UIView *)playerMoveScopeView{
     if (!_playerMoveScopeView) {
         UIView *view = [self.view viewWithTag:45];
