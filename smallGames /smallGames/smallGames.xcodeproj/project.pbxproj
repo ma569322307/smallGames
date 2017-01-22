@@ -82,7 +82,7 @@
 		CD1F6A5C1E308E0400E05179 /* DEInfiniteTileMarqueeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DEInfiniteTileMarqueeView.m; sourceTree = "<group>"; };
 		CD1F6A5E1E3093D400E05179 /* string.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = string.TTF; sourceTree = "<group>"; };
 		CD1F6A601E30A4F000E05179 /* Emilia Rydberg-Big Big World.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Emilia Rydberg-Big Big World.mp3"; sourceTree = "<group>"; };
-		CD31E5A01E1C8A52008B171D /* 跑步永无止境.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "跑步永无止境.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD31E5A01E1C8A52008B171D /* 解救长安.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "解救长安.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD31E5A41E1C8A52008B171D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CD31E5A61E1C8A52008B171D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		CD31E5A71E1C8A52008B171D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		CD31E5A11E1C8A52008B171D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CD31E5A01E1C8A52008B171D /* 跑步永无止境.app */,
+				CD31E5A01E1C8A52008B171D /* 解救长安.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -248,7 +248,7 @@
 			);
 			name = smallGames;
 			productName = smallGames;
-			productReference = CD31E5A01E1C8A52008B171D /* 跑步永无止境.app */;
+			productReference = CD31E5A01E1C8A52008B171D /* 解救长安.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -459,7 +459,7 @@
 				INFOPLIST_FILE = smallGames/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = peiPao.smallGames;
-				PRODUCT_NAME = "跑步永无止境";
+				PRODUCT_NAME = "解救长安";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -477,7 +477,7 @@
 				INFOPLIST_FILE = smallGames/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = peiPao.smallGames;
-				PRODUCT_NAME = "跑步永无止境";
+				PRODUCT_NAME = "解救长安";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

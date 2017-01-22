@@ -150,7 +150,7 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 
 -(void)topView{
     GamesWindowsTopView *view = [GamesWindowsTopView createGamesTopViewInstance];
-    view.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH, 90);
+//    view.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH, 90);
     [self.view addSubview:view];
     
     
@@ -163,6 +163,8 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
     [view addSubview:button];
     
     _count = view.value.width;
+    NSLog(@"%f",view.value.width);
+    
     
     _b = _count;
     
@@ -253,6 +255,9 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    NSLog(@"手机屏幕的宽高:   %f   %f  ",[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
+    
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         //背景音乐的播放

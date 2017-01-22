@@ -24,7 +24,7 @@
     
 
     
-    self.value.progressValue = self.value.width;
+    self.value.progressValue = self.value.frame.size.width;
     
     NSLog(@"----   %f",self.value.width);
     
@@ -38,6 +38,7 @@
 -(void)awakeFromNib{
     
     [super awakeFromNib];
+    self.frame = CGRectMake(0, 0, K_UISCREEN_WIDTH, 90);
     
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
     tapRecognizer.numberOfTapsRequired = 1;
