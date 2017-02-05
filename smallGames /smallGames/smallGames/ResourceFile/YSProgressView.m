@@ -65,6 +65,7 @@
     
     
     self.rect_progressView = CGRectZero;
+ 
     _rect_progressView.size.height = _progressHeight;
     self.progressView.frame = self.rect_progressView;
     

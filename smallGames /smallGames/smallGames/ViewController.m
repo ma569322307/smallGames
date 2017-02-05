@@ -255,7 +255,6 @@ typedef void(^AnimationCompletionBlock) (NSUInteger index);
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
     NSLog(@"手机屏幕的宽高:   %f   %f  ",[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
